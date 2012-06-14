@@ -191,6 +191,7 @@ define(["/jquery.js"], function() {
 
         // the version name
         elem.find(".sha").text(version.sha);
+        elem.find(".sha").attr("title", version.commit.message);
 
         // remove/download icon
         var drLink = elem.find(".download");
