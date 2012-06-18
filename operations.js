@@ -1,8 +1,8 @@
 var send  = require(CONFIG.root + "/core/send.js").send;
+var monoapi = require(CONFIG.root + "/api/server");
 
 var fs = require("fs"),
     path = require('path');
-    cp = require('child_process');
 
 var GitHubApi = require("github"),
     request = require("request");
@@ -44,13 +44,12 @@ exports.modules = function(link) {
                 return;
             }
 
-            fetchVersion(user, repo, sha, function(err, result) {
+            monoapi.installModule(user, repo, sha, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;
                 }
-
-                send.ok(link.res, result);
+                send.ok(link.res, { local: true });
             });
 
             break;
@@ -64,13 +63,12 @@ exports.modules = function(link) {
                 send.badrequest(link, "user, sha, and repo are mandatory fields");
             }
 
-            removeVersion(user, repo, sha, function(err, result) {
+            monoapi.uninstallModule(user, repo, sha, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;
                 }
-
-                send.ok(link.res, result);
+                send.ok(link.res, { local: false });
             });
 
             break;
@@ -138,49 +136,6 @@ function getVersions(user, module, callback) {
         }
 
         callback(null, res);
-    });
-}
-
-function fetchVersion(user, module, version, callback) {
-
-    // clone the repo first
-    var options = {
-        cwd: CONFIG.root + "/modules/" + user + "/" + module
-    };
-    var git = cp.spawn("git", ["clone", "https://github.com/" + user + "/" + module + ".git", version], options);
-
-    git.on("exit", function(code) {
-        if (code) {
-            return callback(link, "git clone exited with code: " + code);
-        }
-
-        // reset to this commit
-        options.cwd = options.cwd + "/" + version;
-        var revert = cp.spawn("git", ["reset", "--hard", version], options);
-
-        revert.on("exit", function(code) {
-            if (code) {
-                return callback("git reset failed with code: " + code);
-            }
-
-            callback(null, { local: true });
-        });
-    });
-}
-
-function removeVersion(user, module, version, callback) {
-
-    var options = {
-        cwd: CONFIG.root + "/modules/" + user + "/" + module + "/"
-    };
-    var git = cp.spawn("rm", ["-Rf", version], options);
-
-    git.on("exit", function(code) {
-        if (code) {
-            send.internalservererror(link, "could not remove version: " + code);
-            return;
-        }
-        send.ok(link.res, { local: false });
     });
 }
 

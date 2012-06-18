@@ -51,6 +51,12 @@ define(["/jquery.js"], function() {
             error.fadeOut();
         });
 
+        $(self.dom).on("click", "#refresh", function() {
+            processHash();
+            return false;
+        });
+
+
         processHash();
     }
 
