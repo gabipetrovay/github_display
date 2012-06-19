@@ -116,7 +116,7 @@ function getModules(user, callback) {
 }
 
 
-function getVersions(user, module, callback) {
+function getVersions(source, user, module, callback) {
 
     var data = {
         user: user,
@@ -130,7 +130,7 @@ function getVersions(user, module, callback) {
         }
 
         for (var i = 0; i < res.length; i++) {
-            if (path.existsSync(CONFIG.root + "/modules/" + user + "/" + module + "/" + res[i].sha)) {
+            if (path.existsSync(CONFIG.root + "/modules/" + source + "/" + user + "/" + module + "/" + res[i].sha)) {
                 res[i].local = true;
             }
         }
