@@ -121,7 +121,7 @@ define(["/jquery.js"], function() {
                 wait("modules", { user: splits[0] }, showModules);
                 break;
             case 2:
-                wait("versions", { user: splits[0], module: splits[1] }, showVersions);
+                wait("versions", { source: "github", user: splits[0], module: splits[1] }, showVersions);
                 break;
         }
 
@@ -193,7 +193,7 @@ define(["/jquery.js"], function() {
         var elem = $(this);
 
         // the GitHub link
-        elem.find(".external").attr("href", version.url.replace("api.github.com/repos", "github.com").replace("git/commits", "commit"));
+        elem.find(".external").attr("href", version.commit.url.replace("api.github.com/repos", "github.com").replace("git/commits", "tree"));
 
         // the version name
         elem.find(".sha").text(version.sha);

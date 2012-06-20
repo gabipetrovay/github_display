@@ -26,7 +26,7 @@ exports.modules = function(link) {
             break;
 
         case "versions":
-            getVersions(link.data.user, link.data.module, function(err, versions) {
+            getVersions(link.data.source, link.data.user, link.data.module, function(err, versions) {
                 if (err) {
                     send.internalservererror(link, err);
                 }
@@ -116,9 +116,10 @@ function getModules(user, callback) {
 }
 
 
-function getVersions(user, module, callback) {
+function getVersions(source, user, module, callback) {
 
     var data = {
+        source: source,
         user: user,
         repo: module
     };
@@ -130,7 +131,7 @@ function getVersions(user, module, callback) {
         }
 
         for (var i = 0; i < res.length; i++) {
-            if (path.existsSync(CONFIG.root + "/modules/" + user + "/" + module + "/" + res[i].sha)) {
+            if (path.existsSync(CONFIG.root + "/modules/" + source + "/" + user + "/" + module + "/" + res[i].sha)) {
                 res[i].local = true;
             }
         }
