@@ -35,16 +35,17 @@ exports.modules = function(link) {
             break;
 
         case "download":
-            var user = link.data.user,
+            var source = link.data.source,
+                user = link.data.user,
                 repo = link.data.repo,
                 sha = link.data.sha;
 
-            if (!sha || !user || !repo) {
-                send.badrequest(link, "user, sha, and repo are mandatory fields");
+            if (!source || !sha || !user || !repo) {
+                send.badrequest(link, "source, user, sha, and repo are mandatory fields");
                 return;
             }
 
-            monoapi.installModule(user, repo, sha, function(err, result) {
+            monoapi.installModule(source, user, repo, sha, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;
@@ -55,15 +56,16 @@ exports.modules = function(link) {
             break;
 
         case "remove":
-            var user = link.data.user,
+            var source = link.data.source,
+                user = link.data.user,
                 repo = link.data.repo,
                 sha = link.data.sha;
 
-            if (!sha || !user || !repo) {
-                send.badrequest(link, "user, sha, and repo are mandatory fields");
+            if (!source || !sha || !user || !repo) {
+                send.badrequest(link, "source, user, sha, and repo are mandatory fields");
             }
 
-            monoapi.uninstallModule(user, repo, sha, function(err, result) {
+            monoapi.uninstallModule(source, user, repo, sha, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;

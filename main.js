@@ -17,6 +17,9 @@ define(["/jquery.js"], function() {
 
         self = this;
 
+        // TODO application scripts
+        //$("#providers", self.dom).button();
+
         throbber = $("#throbber", self.dom);
         error = $("#errorMessage", self.dom);
         backLink = $("#backLink", self.dom);
@@ -71,6 +74,7 @@ define(["/jquery.js"], function() {
         var options = {
             data: {
                 sha: sha,
+                source: "github",
                 repo: navTitle.text(),
                 user: backLink.find("span").text()
             },
