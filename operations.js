@@ -133,12 +133,40 @@ function getVersions(source, user, module, callback) {
         }
 
         for (var i = 0; i < res.length; i++) {
-            if (path.existsSync(CONFIG.root + "/modules/" + source + "/" + user + "/" + module + "/" + res[i].sha)) {
+            if (fs.existsSync(CONFIG.root + "/modules/" + source + "/" + user + "/" + module + "/" + res[i].sha)) {
                 res[i].local = true;
             }
         }
 
         callback(null, res);
+
+//        // TODO if versions must be individually checked for existing mono.json file
+//        //      but this will screw the version order :(
+//
+//        var count = res.length;
+//        if (!count) {
+//            return callback(null, []);
+//        }
+//
+//        var versions = [];
+//
+//        for (var i = 0; i < res.length; i++) {
+//            (function (commit) {
+//                var sourcePath = data.user + "/" + module + "/" + commit.sha;
+//                request.head("https://raw.github.com/" + sourcePath + "/mono.json", function(err, response) {
+//                    if (!err && response.statusCode == 200) {
+//                        versions.push(commit);
+//                        if (fs.existsSync(CONFIG.root + "/modules/" + source + "/" + sourcePath)) {
+//                            commit.local = true;
+//                        }
+//                    }
+//                    count--;
+//                    if (!count) {
+//                        callback(null, versions);
+//                    }
+//                }); 
+//            })(res[i]);
+//        }
     });
 }
 
