@@ -1,15 +1,8 @@
 var send  = require(CONFIG.root + "/core/send.js").send;
 var monoapi = require(CONFIG.root + "/api/server");
+var repos = require(CONFIG.root + "/api/repos");
 
-var fs = require("fs"),
-    path = require('path');
-
-var GitHubApi = require("github"),
-    request = require("request");
-
-var github = new GitHubApi({
-    version: "3.0.0"
-});
+var fs = require("fs");
 
 
 exports.modules = function(link) {
@@ -17,7 +10,7 @@ exports.modules = function(link) {
     switch (link.path[0]) {
 
         case "modules":
-            getModules(link.data.user, function(err, modules) {
+            repos.getModules(link.data.source, link.data.owner, function(err, modules) {
                 if (err) {
                     send.internalservererror(link, err);
                 }
@@ -26,7 +19,7 @@ exports.modules = function(link) {
             break;
 
         case "versions":
-            getVersions(link.data.source, link.data.user, link.data.module, function(err, versions) {
+            repos.getVersions(link.data.source, link.data.owner, link.data.module, function(err, versions) {
                 if (err) {
                     send.internalservererror(link, err);
                 }
@@ -36,16 +29,16 @@ exports.modules = function(link) {
 
         case "download":
             var source = link.data.source,
-                user = link.data.user,
+                owner = link.data.owner,
                 repo = link.data.repo,
                 sha = link.data.sha;
 
-            if (!source || !sha || !user || !repo) {
-                send.badrequest(link, "source, user, sha, and repo are mandatory fields");
+            if (!source || !sha || !owner || !repo) {
+                send.badrequest(link, "source, owner, sha, and repo are mandatory fields");
                 return;
             }
 
-            monoapi.installModule(source, user, repo, sha, function(err, result) {
+            monoapi.installModule(source, owner, repo, sha, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;
@@ -57,15 +50,15 @@ exports.modules = function(link) {
 
         case "remove":
             var source = link.data.source,
-                user = link.data.user,
+                owner = link.data.owner,
                 repo = link.data.repo,
                 sha = link.data.sha;
 
-            if (!source || !sha || !user || !repo) {
-                send.badrequest(link, "source, user, sha, and repo are mandatory fields");
+            if (!source || !sha || !owner || !repo) {
+                send.badrequest(link, "source, owner, sha, and repo are mandatory fields");
             }
 
-            monoapi.uninstallModule(source, user, repo, sha, function(err, result) {
+            monoapi.uninstallModule(source, owner, repo, sha, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;
@@ -79,94 +72,4 @@ exports.modules = function(link) {
             send.notfound(link, "Invalid action: " + link.path);
     }
 };
-
-
-function getModules(user, callback) {
-
-    var data = {
-        user: user,
-        type: "owner"
-    };
-
-    github.repos.getFromUser(data, function(err, res) {
-
-        if (err) {
-            return callback(err.message || err);
-        }
-
-        var modules = [];
-        var count = res.length;
-
-        if (!count) {
-            return callback(null, []);
-        }
-
-        for (var i = 0; i < count; i++) {
-            (function (repo) {
-                request.head("https://raw.github.com/" + data.user + "/" + res[i].name + "/master/mono.json", function(err, response) {
-                    if (!err && response.statusCode == 200) {
-                        modules.push(repo);
-                    }
-                    count--;
-                    if (!count) {
-                        callback(null, modules)
-                    }
-                }); 
-            })(res[i]);
-        }
-    });
-}
-
-
-function getVersions(source, user, module, callback) {
-
-    var data = {
-        source: source,
-        user: user,
-        repo: module
-    };
-
-    github.repos.getCommits(data, function(err, res) {
-        if (err) {
-            send.internalservererror(link, err.message);
-            return;
-        }
-
-        for (var i = 0; i < res.length; i++) {
-            if (fs.existsSync(CONFIG.root + "/modules/" + source + "/" + user + "/" + module + "/" + res[i].sha)) {
-                res[i].local = true;
-            }
-        }
-
-        callback(null, res);
-
-//        // TODO if versions must be individually checked for existing mono.json file
-//        //      but this will screw the version order :(
-//
-//        var count = res.length;
-//        if (!count) {
-//            return callback(null, []);
-//        }
-//
-//        var versions = [];
-//
-//        for (var i = 0; i < res.length; i++) {
-//            (function (commit) {
-//                var sourcePath = data.user + "/" + module + "/" + commit.sha;
-//                request.head("https://raw.github.com/" + sourcePath + "/mono.json", function(err, response) {
-//                    if (!err && response.statusCode == 200) {
-//                        versions.push(commit);
-//                        if (fs.existsSync(CONFIG.root + "/modules/" + source + "/" + sourcePath)) {
-//                            commit.local = true;
-//                        }
-//                    }
-//                    count--;
-//                    if (!count) {
-//                        callback(null, versions);
-//                    }
-//                }); 
-//            })(res[i]);
-//        }
-    });
-}
 

@@ -139,10 +139,10 @@ define(function() {
                 window.location.hash = "";
                 break;
             case 2:
-                wait("modules", { source: splits[0], user: splits[1] }, showModules);
+                wait("modules", { source: splits[0], owner: splits[1] }, showModules);
                 break;
             case 3:
-                wait("versions", { source: splits[0], user: splits[1], module: splits[2] }, showVersions);
+                wait("versions", { source: splits[0], owner: splits[1], module: splits[2] }, showVersions);
                 break;
         }
 
