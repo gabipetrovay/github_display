@@ -1,4 +1,4 @@
-define(["/jquery.js"], function() {
+define(function() {
 
     var self;
 
@@ -13,12 +13,20 @@ define(["/jquery.js"], function() {
 
     var all = null;
 
+    var source = "github";
+
     function init(config) {
 
         self = this;
 
-        // TODO application scripts
-        //$("#providers", self.dom).button();
+        $("#providers", self.dom).button();
+        $("#providers", self.dom).on("click", ".btn", function() {
+            if (!$(this).hasClass("active")) {
+                var text = $(this).text();
+                source = text.toLowerCase();
+                $("#ghuser").attr("placeholder", text + " User");
+            }
+        });
 
         throbber = $("#throbber", self.dom);
         error = $("#errorMessage", self.dom);
@@ -38,12 +46,12 @@ define(["/jquery.js"], function() {
             if (!user) {
                 return false;
             }
-            window.location.hash = user;
+            window.location.hash = source + "/" + user;
             return false;
         });
 
         $("#modules", self.dom).on("click", ".module", function() {
-            navigateHash(1, $(this).text());
+            navigateHash(2, $(this).text());
             return false;
         });
 
@@ -74,7 +82,7 @@ define(["/jquery.js"], function() {
         var options = {
             data: {
                 sha: sha,
-                source: "github",
+                source: source,
                 repo: navTitle.text(),
                 user: backLink.find("span").text()
             },
@@ -105,7 +113,7 @@ define(["/jquery.js"], function() {
             return;
         }
         splits[position] = value;
-        hash = "#";
+        hash = "";
         for (var i = 0; i <= position; i++) {
             hash += splits[i] + "/";
         }
@@ -119,13 +127,22 @@ define(["/jquery.js"], function() {
             showForm();
             return;
         }
+        // remove trailing slash
+        if (hash.substr(-1) === "/") {
+            window.location.hash = hash.slice(0, -1);
+            return;
+        }
         var splits = hash.split("/");
+        source = splits[0];
         switch (splits.length) {
             case 1:
-                wait("modules", { user: splits[0] }, showModules);
+                window.location.hash = "";
                 break;
             case 2:
-                wait("versions", { source: "github", user: splits[0], module: splits[1] }, showVersions);
+                wait("modules", { source: splits[0], user: splits[1] }, showModules);
+                break;
+            case 3:
+                wait("versions", { source: splits[0], user: splits[1], module: splits[2] }, showVersions);
                 break;
         }
 
@@ -176,19 +193,25 @@ define(["/jquery.js"], function() {
 
     function showNavigator() {
         var hash = window.location.hash;
-        if (hash.substr(-1) === "/") {
-            hash.slice(0, -1);
-        }
 
-        var index = hash.lastIndexOf("/");
-        if (index > 0) {
-            navTitle.text(hash.substr(index + 1));
-            backLink.find("span").text(hash.substr(1, index - 1));
-            backLink.attr("href", hash.slice(0, index));
-        } else {
-            navTitle.text(hash.substr(index + 2));
-            backLink.find("span").text("user search");
-            backLink.attr("href", "#");
+        var splits = hash.split("/");
+        var len = splits.length;
+        switch (len) {
+            case 1:
+                return;
+            case 2:
+                navTitle.text(splits[1]);
+                backLink.find("span").text("user search");
+                backLink.attr("href", "#");
+                break;
+            case 3:
+                navTitle.text(splits[2]);
+                backLink.find("span").text(splits[1]);
+                backLink.attr("href", splits[0] + "/" + splits[1]);
+                break;
+            case 4:
+                window.location.hash = "";
+                return;
         }
         navigate.show();
     }
