@@ -1,7 +1,14 @@
 {
+    "source": "github",
+    "owner": "gabipetrovay",
+    "name": "github_display",
     "main": "main.js",
     "operations": [
         { "file": "operations.js", "function": "modules" }
-    ]
+    ],
+    "dependencies": {
+        "github/adioo/layout": "*",
+        "github/adioo/bind": "*"
+    }
 }
 

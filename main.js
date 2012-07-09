@@ -81,10 +81,10 @@ define(function() {
 
         var options = {
             data: {
-                sha: sha,
                 source: source,
+                owner: backLink.find("span").text(),
                 repo: navTitle.text(),
-                user: backLink.find("span").text()
+                sha: sha
             },
             path: action
         };

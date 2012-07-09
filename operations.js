@@ -38,7 +38,8 @@ exports.modules = function(link) {
                 return;
             }
 
-            monoapi.installModule(source, owner, repo, sha, function(err, result) {
+            var module = new monoapi.Module(source, owner, repo, sha);
+            monoapi.installModule(module, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;
@@ -58,7 +59,8 @@ exports.modules = function(link) {
                 send.badrequest(link, "source, owner, sha, and repo are mandatory fields");
             }
 
-            monoapi.uninstallModule(source, owner, repo, sha, function(err, result) {
+            var module = new monoapi.Module(source, owner, repo, sha);
+            monoapi.uninstallModule(module, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;
