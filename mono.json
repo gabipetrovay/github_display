@@ -7,8 +7,8 @@
         { "file": "operations.js", "function": "modules" }
     ],
     "dependencies": {
-        "github/adioo/layout": "*",
-        "github/adioo/bind": "*"
+        "github/adioo/layout": "latest",
+        "github/adioo/bind": "latest"
     }
 }
 
