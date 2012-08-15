@@ -1,5 +1,5 @@
 var send  = require(CONFIG.root + "/core/send.js").send;
-var monoapi = require(CONFIG.root + "/api/server");
+var modules = require(CONFIG.root + "/api/modules");
 var repos = require(CONFIG.root + "/api/repos");
 
 var fs = require("fs");
@@ -38,8 +38,8 @@ exports.modules = function(link) {
                 return;
             }
 
-            var module = new monoapi.Module(source, owner, repo, version);
-            monoapi.installModule(module, function(err, result) {
+            var module = new modules.Module(source, owner, repo, version);
+            modules.installModule(module, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;
@@ -59,8 +59,8 @@ exports.modules = function(link) {
                 send.badrequest(link, "source, owner, version, and repo are mandatory fields");
             }
 
-            var module = new monoapi.Module(source, owner, repo, version);
-            monoapi.uninstallModule(module, function(err, result) {
+            var module = new modules.Module(source, owner, repo, version);
+            modules.uninstallModule(module, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
                     return;
