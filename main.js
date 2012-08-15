@@ -76,7 +76,7 @@ define(function() {
         link.hide();
         link.after("<img src='throbber.sml.gif'/>")
     
-        var sha = this.sha;
+        var version = this.version_name;
         var action = link.attr("class");
 
         var options = {
@@ -84,7 +84,7 @@ define(function() {
                 source: source,
                 owner: backLink.find("span").text(),
                 repo: navTitle.text(),
-                sha: sha
+                version: version
             },
             path: action
         };
@@ -216,19 +216,12 @@ define(function() {
         navigate.show();
     }
 
-    var handleVersion = function(version) {
+    var handleLocal = function(version) {
         var elem = $(this);
-
-        // the GitHub link
-        elem.find(".external").attr("href", version.commit.url.replace("api.github.com/repos", "github.com").replace("git/commits", "tree"));
-
-        // the version name
-        elem.find(".sha").text(version.sha);
-        elem.find(".sha").attr("title", version.commit.message);
 
         // remove/download icon
         var drLink = elem.find(".download");
-        drLink[0].sha = version.sha;
+        drLink[0].version_name = version.name;
         drLink.find("i").addClass(version.local ? "icon-remove" : "icon-download").attr("title", version.local ? "Remove local version" : "Bring version local");
 
         if (version.local) {
@@ -252,24 +245,24 @@ define(function() {
             var instance = template.clone();
 
             if (handler) {
-                eval(handler).call(instance, (data[i]));
+                eval(handler).call(instance, data[i]);
             } else {
                 instance.find("[data-field]").each(function() {
                     var elem = $(this);
-                    var value = data[i][elem.attr("data-field")];
 
-                    var handler = elem.attr("data-handler");
-                    if (handler) {
-                        return;
-                    }
+                    var value = data[i][elem.attr("data-field")];
 
                     var attrTarget = elem.attr("data-target");
                     if (attrTarget) {
                         elem.attr(attrTarget, value);
-                        return;
+                    } else {
+                        elem.text(value);
                     }
-
-                    elem.text(value);
+                });
+                instance.find("[data-handler]").each(function() {
+                    var elem = $(this);
+                    var itemHandler = elem.attr("data-handler");
+                    eval(itemHandler).call(elem, data[i]);
                 });
             }
 

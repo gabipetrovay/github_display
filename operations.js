@@ -31,14 +31,14 @@ exports.modules = function(link) {
             var source = link.data.source,
                 owner = link.data.owner,
                 repo = link.data.repo,
-                sha = link.data.sha;
+                version = link.data.version;
 
-            if (!source || !sha || !owner || !repo) {
-                send.badrequest(link, "source, owner, sha, and repo are mandatory fields");
+            if (!source || !version || !owner || !repo) {
+                send.badrequest(link, "source, owner, version, and repo are mandatory fields");
                 return;
             }
 
-            var module = new monoapi.Module(source, owner, repo, sha);
+            var module = new monoapi.Module(source, owner, repo, version);
             monoapi.installModule(module, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
@@ -53,13 +53,13 @@ exports.modules = function(link) {
             var source = link.data.source,
                 owner = link.data.owner,
                 repo = link.data.repo,
-                sha = link.data.sha;
+                version = link.data.version;
 
-            if (!source || !sha || !owner || !repo) {
-                send.badrequest(link, "source, owner, sha, and repo are mandatory fields");
+            if (!source || !version || !owner || !repo) {
+                send.badrequest(link, "source, owner, version, and repo are mandatory fields");
             }
 
-            var module = new monoapi.Module(source, owner, repo, sha);
+            var module = new monoapi.Module(source, owner, repo, version);
             monoapi.uninstallModule(module, function(err, result) {
                 if (err) {
                     send.internalservererror(link, err);
