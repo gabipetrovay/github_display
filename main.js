@@ -1,4 +1,7 @@
-define(function() {
+define([
+        "/jquery.js",
+        "/bootstrap/js/bootstrap-button.js"
+    ], function() {
 
     var self;
 
