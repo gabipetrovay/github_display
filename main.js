@@ -61,9 +61,7 @@ define([
         $("#versions", self.dom).on("click", ".download", versionAction);
         $("#versions", self.dom).on("click", ".remove", versionAction);
 
-        $("#errorMessage", self.dom).on("click", "button", function() {
-            error.fadeOut();
-        });
+        $("#errorMessage", self.dom).on("click", "button", hideError);
 
         $(self.dom).on("click", "#refresh", function() {
             processHash();
@@ -72,6 +70,10 @@ define([
 
 
         processHash();
+    }
+
+    function hideError() {
+        error.fadeOut();
     }
 
     function versionAction() {
@@ -125,6 +127,9 @@ define([
 
 
     function processHash() {
+
+        hideError();
+
         var hash = window.location.hash.substr(1);
         if (hash === "") {
             showForm();
